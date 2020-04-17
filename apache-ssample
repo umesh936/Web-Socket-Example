@@ -1,0 +1,35 @@
+
+<VirtualHost *:80>
+  ServerName localhost
+  ProxyPreserveHost On
+
+  ProxyPass / http://localhost:12345/
+  ProxyPassReverse / http://localhost:12345/
+
+  SetEnvIf Request_URI ^/greeting/ is_websocket
+  RequestHeader set Upgrade WebSocket env=is_websocket
+  ProxyPass /greeting/ ws://myserver.local:12345/greeting
+
+  RewriteEngine on
+  RewriteCond %{HTTP:UPGRADE} ^WebSocket$ [NC]
+  RewriteCond %{HTTP:CONNECTION} ^Upgrade$ [NC]
+  RewriteRule .* ws://localhost:12345%{REQUEST_URI} [P]
+  
+
+</VirtualHost>
+
+
+## Module to enable
+LoadModule alias_module libexec/apache2/mod_alias.so
+LoadModule rewrite_module libexec/apache2/mod_rewrite.so
+LoadModule status_module libexec/apache2/mod_status.so
+LoadModule http2_module libexec/apache2/mod_http2.so
+LoadModule ssl_module libexec/apache2/mod_ssl.so
+ `LoadModule proxy_wstunnel_module libexec/apache2/mod_proxy_wstunnel.so`
+LoadModule proxy_ajp_module libexec/apache2/mod_proxy_ajp.so
+LoadModule proxy_module libexec/apache2/mod_proxy.so
+LoadModule proxy_connect_module libexec/apache2/mod_proxy_connect.so
+LoadModule proxy_ftp_module libexec/apache2/mod_proxy_ftp.so
+LoadModule proxy_http_module libexec/apache2/mod_proxy_http.so
+LoadModule setenvif_module libexec/apache2/mod_setenvif.so
+LoadModule log_debug_module libexec/apache2/mod_log_debug.so
